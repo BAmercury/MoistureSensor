@@ -10,6 +10,7 @@ LEDPin PIN 0
 mainloop:
 
 GOSUB ReadMoisture
+GOSUB CheckMeasurement
 GOTO mainloop 'loop again
 
 
@@ -22,6 +23,7 @@ HIGH MoistInputPin 'discharge capacitor
 PAUSE 1 'wait for 1 milisecond, allow for cap to fully charge again
 RCTIME MoistInputPin, 1, Moisture 'Collect the time it took to charge
 DEBUG ? moisture 'display the measured value
+RETURN 'Go back to main program
 
 'Subroutine to check if measurement if Good or Dry
 CheckMeasurement:
@@ -33,6 +35,4 @@ IF (Moisture > GoodThres)THEN
 'Turn off LED
 LOW LEDPin
 ENDIF
-
-
 RETURN 'go back to rest of the program
