@@ -1,0 +1,38 @@
+'{$STAMP BS2}
+' {$PBASIC 2.5}
+' ===================== Variables =========
+Moisture VAR Byte
+DryThres CON 100 'Threshold for Dry
+GoodThres CON 500 'Threshold for Good
+MoistInputPin PIN 15
+LEDPin PIN 0
+' ===================== Program =========
+mainloop:
+
+GOSUB ReadMoisture
+GOTO mainloop 'loop again
+
+
+
+'Subroutine that will measure RC time constant, where R is the
+'varying resistance of the soil moisture sensor and C is
+'of some known capcitance
+ReadMoisture:
+HIGH MoistInputPin 'discharge capacitor
+PAUSE 1 'wait for 1 milisecond, allow for cap to fully charge again
+RCTIME MoistInputPin, 1, Moisture 'Collect the time it took to charge
+DEBUG ? moisture 'display the measured value
+
+'Subroutine to check if measurement if Good or Dry
+CheckMeasurement:
+IF (Moisture < GoodThres)THEN
+'Turn on LED
+HIGH LEDPin
+ENDIF
+IF (Moisture > GoodThres)THEN
+'Turn off LED
+LOW LEDPin
+ENDIF
+
+
+RETURN 'go back to rest of the program
