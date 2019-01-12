@@ -1,0 +1,15 @@
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+
+rct VAR Word 'Word Variable to track time measured for cap to discharge
+
+DO
+  HIGH 3 'Turn on LED
+
+  HIGH 6 'charge the cap
+  PAUSE 1 'wait for 1 ms
+  RCTIME 6, 1, rct 'measure rc discharge time. State of the pin initially is high (1)
+  DEBUG DEC ? rct 'Display result
+
+  LOW 3 'turn off led
+LOOP

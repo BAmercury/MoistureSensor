@@ -1,0 +1,17 @@
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+
+'Simple test script to test 555 timer configuration
+calib_duration CON 1696 'Duration value that maps 100kohm 10e-5 siemens
+cnt VAR Word
+resis VAR Word
+DEBUG "Hello!", CR
+HIGH 9 'Turn on 555 timer
+
+DO
+  COUNT 11, 1696, cnt 'Count for around 1 second
+  resis = 50000/cnt*2 'Calculate resistance, R = 1/G
+  DEBUG DEC cnt, "E-7",
+        TAB, DEC resis, "00", CR 'Show Values
+
+LOOP

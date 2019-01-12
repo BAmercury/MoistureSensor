@@ -1,14 +1,30 @@
 '{$STAMP BS2}
 ' {$PBASIC 2.5}
+' ===================== Constants and Pins =========
+ConductanceCal CON 1333 'Calibration constant for conductance
+Interval CON 10 'Poll for data every 10 seconds
+GoodThres CON 710 'Threshold for Good
+MoistInputPin PIN 10 '555 Timer Output Pin
+AstablePin PIN 9 '555 Timer Reset Pin
+LEDPin PIN 3 'Status Light
+PotPin 6 'Measure RC discharge time to indicate potentiometer position
+
 ' ===================== Variables =========
-Moisture VAR Byte
-DryThres CON 24 'Threshold for Dry
-GoodThres CON 0 'Threshold for Good
-MoistInputPin PIN 15
-LEDPin PIN 0
+cnt VAR Word 'Variable for COUNT function
 ' ===================== Program =========
 DEBUG "Hello!"
+INPUT MoistInputPin 'Set pin 10 as input
 mainloop:
+
+DO
+  n = 0 'Initialze a counter
+  DO
+    PAUSE 1000
+    n = n + 1
+  LOOP UNTIL (n=Interval)
+  GOSUB ReadConductivity
+
+
 
 GOSUB ReadMoisture
 GOSUB CheckMeasurement
@@ -16,19 +32,21 @@ GOTO mainloop 'loop again
 
 
 
-'Subroutine that will measure RC time constant, where R is the
-'varying resistance of the soil moisture sensor and C is
-'of some known capcitance
-ReadMoisture:
-HIGH MoistInputPin 'discharge capacitor
-PAUSE 1 'wait for 1 milisecond, allow for cap to fully charge again
-RCTIME MoistInputPin, 1, Moisture 'Collect the time it took to charge
-DEBUG ? Moisture 'display the measured value
-RETURN 'Go back to main program
+ReadConductivity:
+HIGH AstablePin 'Turn on the Astable multivibrator
+PAUSE 100 'Delay for vibrator to get up to speed
+COUNT MoistInputPin, ConductanceCal, cnt 'Count the frequency
+LOW AstablePin
+R = 50000/cnt*2 'Calculate resistnace in R = 1/G
+DEBUG DEC cnt, "E-7",
+  TAB, DEC R, "00", CR 'Show Values, append two 00's to R to make it in ohms
+RETURN
+
+
 
 'Subroutine to check if measurement if Good or Dry
 CheckMeasurement:
-IF (Moisture > GoodThres)THEN
+IF (Moisture >= GoodThres)THEN
 'Turn on LED
 HIGH LEDPin
 ENDIF
